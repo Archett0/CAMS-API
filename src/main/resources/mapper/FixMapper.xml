@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiangliban.managementsystem.dao.mapper.FixMapper">
+
+    <resultMap id="FixRequest" type="java.util.HashMap">
+        <id column="fix_id" property="fixId"/>
+        <result column="fix_user_id" property="fixUserId"/>
+        <result column="fix_user_name" property="fixUserName"/>
+        <result column="fix_user_phone" property="fixUserPhone"/>
+        <result column="fix_user_address" property="fixUserAddress"/>
+        <result column="fix_user_door" property="fixUserDoor"/>
+        <result column="fix_expect_time" property="fixExpectTime"/>
+        <result column="fix_type" property="fixType"/>
+        <result column="fix_details" property="fixDetails"/>
+        <result column="fix_picture" property="fixPicture"/>
+        <result column="fix_submit_time" property="fixSubmitTime"/>
+    </resultMap>
+
+    <resultMap id="FixOrder" type="java.util.HashMap">
+        <id column="fix_order_id" property="fixOrderId"/>
+        <result column="fix_id" property="fixId"/>
+        <result column="fix_status" property="fixStatus"/>
+        <result column="fix_worker_id" property="fixWorkerId"/>
+        <result column="fix_material" property="fixMaterial"/>
+        <result column="fix_material_cost" property="fixMaterialCost"/>
+        <result column="fix_labor_cost" property="fixLaborCost"/>
+        <result column="fix_timeline" property="fixTimeline"/>
+    </resultMap>
+
+    <resultMap id="FixOrderWithBrief" type="java.util.HashMap">
+        <id column="fix_order_id" property="fixOrderId"/>
+        <result column="fix_id" property="fixId"/>
+        <result column="fix_user_address" property="fixUserAddress"/>
+        <result column="fix_expect_time" property="fixExpectTime"/>
+        <result column="fix_type" property="fixType"/>
+        <result column="fix_details" property="fixDetails"/>
+        <result column="fix_submit_time" property="fixSubmitTime"/>
+    </resultMap>
+
+    <resultMap id="FixOrderWithDetails" type="java.util.HashMap">
+        <!--Order information-->
+        <id column="fix_order_id" property="fixOrderId"/>
+        <result column="fix_id" property="fixId"/>
+        <result column="fix_status" property="fixStatus"/>
+        <result column="fix_worker_id" property="fixWorkerId"/>
+        <result column="fix_material" property="fixMaterial"/>
+        <result column="fix_material_cost" property="fixMaterialCost"/>
+        <result column="fix_labor_cost" property="fixLaborCost"/>
+        <result column="fix_timeline" property="fixTimeline"/>
+        <!--Original request information that user provides-->
+        <result column="fix_user_id" property="fixUserId"/>
+        <result column="fix_user_name" property="fixUserName"/>
+        <result column="fix_user_phone" property="fixUserPhone"/>
+        <result column="fix_user_address" property="fixUserAddress"/>
+        <result column="fix_user_door" property="fixUserDoor"/>
+        <result column="fix_expect_time" property="fixExpectTime"/>
+        <result column="fix_type" property="fixType"/>
+        <result column="fix_details" property="fixDetails"/>
+        <result column="fix_picture" property="fixPicture"/>
+        <result column="fix_submit_time" property="fixSubmitTime"/>
+        <!--Data collected by joint query-->
+        <result column="fix_department_id" property="fixDepartmentId"/>
+        <result column="fix_department_name" property="fixDepartmentName"/>
+        <result column="fix_worker_name" property="fixWorkerName"/>
+        <result column="fix_worker_phone" property="fixWorkerPhone"/>
+    </resultMap>
+
+    <resultMap id="FixDepartment" type="java.util.HashMap">
+        <id column="fix_department_id" property="fixDepartmentId"/>
+        <result column="fix_department_name" property="fixDepartmentName"/>
+    </resultMap>
+
+    <resultMap id="FixWorker" type="java.util.HashMap">
+        <id column="fix_worker_id" property="fixWorkerId"/>
+        <result column="fix_department_id" property="fixDepartmentId"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="age" property="age"/>
+        <result column="phone" property="phone"/>
+        <result column="id" property="id"/>
+        <result column="political_face" property="political_face"/>
+        <result column="authorization" property="authorization"/>
+        <result column="avatar" property="avatar"/>
+    </resultMap>
+
+    <resultMap id="FixStatusDiagram" type="java.util.HashMap">
+        <id column="fix_status" property="fixStatus"/>
+        <result column="fix_number" property="fixNumber"/>
+    </resultMap>
+
+    <resultMap id="FixDailyDiagram" type="com.xiangliban.managementsystem.pojo.Fix.FixDailyDiagram">
+        <id column="fix_worker_id" property="fixWorkerId"/>
+        <result column="fix_timeline" property="fixTimeline"/>
+    </resultMap>
+
+    <!--==========================================================================-->
+    <!--    工作人员和管理员都可使用-->
+    <!--    根据指定的维修人员id,查询维修工单并合并提供该工单的报修详细信息-->
+    <select id="selectAllFixDetailsByWorkerId" resultMap="FixOrderWithDetails">
+        SELECT o.fix_order_id,
+               o.fix_id,
+               o.fix_status,
+               o.fix_worker_id,
+               o.fix_material,
+               o.fix_material_cost,
+               o.fix_labor_cost,
+               o.fix_timeline,
+               r.fix_user_id,
+               r.fix_user_name,
+               r.fix_user_phone,
+               r.fix_user_address,
+               r.fix_user_door,
+               r.fix_expect_time,
+               r.fix_type,
+               r.fix_details,
+               r.fix_picture,
+               r.fix_submit_time,
+               d.fix_department_id,
+               d.fix_department_name,
+               u.`name`,
+               u.phone
+        FROM `fix_order` o,
+             `fix_request` r,
+             `fix_worker` w,
+             `fix_department` d,
+             `user` u
+        WHERE o.`fix_id` = r.`fix_id`
+          AND o.`fix_worker_id` = w.`fix_worker_id`
+          AND w.`fix_department_id` = d.`fix_department_id`
+          AND u.uid = w.fix_worker_id
+          AND o.`fix_worker_id` = #{fixWorkerId}
+    </select>
+
+    <!--    查询所有未处理的报修申请,仅提供少量信息-->
+    <select id="selectAllUnprocessedOrder" resultMap="FixOrderWithBrief">
+        SELECT a.`fix_order_id`,
+               a.`fix_id`,
+               b.`fix_user_address`,
+               b.`fix_expect_time`,
+               b.`fix_type`,
+               b.`fix_details`,
+               b.`fix_submit_time`
+        FROM `fix_order` a,
+             `fix_request` b
+        WHERE a.`fix_id` = b.`fix_id`
+          AND a.`fix_status` = 1
+    </select>
+
+    <!--    根据工单id,获得并分析时间线-->
+    <select id="analysisTimeline" resultType="String">
+        SELECT fix_timeline
+        FROM `fix_order`
+        WHERE fix_order_id = #{fixOrderId}
+    </select>
+
+    <!--==========================================================================-->
+    <!--    仅工作人员使用-->
+    <!--    根据选中的单号进行接单,即将订单状态修改为2已派单并自动填入工作人员id-->
+    <update id="takeOrderByOrderIdAndWorkerId" parameterType="FixOrder">
+        update `fix_order`
+        set `fix_status`= 2,
+            `fix_worker_id` = #{fixWorkerId},
+            `fix_timeline` = concat(`fix_timeline`, #{fixTimeline})
+        where `fix_order_id` = #{fixOrderId}
+    </update>
+
+    <!--    工作人员出发,即将订单状态修改为3进行中并自动填入时间线-->
+    <update id="ongoingOrderByOrderId" parameterType="FixOrder">
+        update `fix_order`
+        set `fix_status`= 3,
+            `fix_timeline` = concat(`fix_timeline`, #{fixTimeline})
+        where `fix_order_id` = #{fixOrderId}
+    </update>
+
+    <!--    工作人员确认维修完成并输入耗材,即将订单状态修改为4已完成并自动填入信息-->
+    <update id="endOrderByOrderIdAndInfo" parameterType="FixOrder">
+        update `fix_order`
+        set `fix_status`= 4,
+            `fix_material` = #{fixMaterial},
+            `fix_material_cost` = #{fixMaterialCost},
+            `fix_labor_cost` = #{fixLaborCost},
+            `fix_timeline` = concat(`fix_timeline`, #{fixTimeline})
+        where `fix_order_id` = #{fixOrderId}
+    </update>
+
+    <!--==========================================================================-->
+    <!--    仅管理员使用-->
+    <!--    查询所有维修工单-->
+    <select id="selectAllFixOrder" resultMap="FixOrder">
+        select *
+        from `fix_order`
+    </select>
+
+    <!--    查询所有报修申请-->
+    <select id="selectAllFixRequest" resultMap="FixRequest">
+        select *
+        from `fix_request`
+    </select>
+
+    <!--    查询全部维修工单并合并提供该工单的报修详细信息-->
+    <select id="selectAllFixDetails" resultMap="FixOrderWithDetails">
+        SELECT joint_table3.fix_order_id,
+               joint_table3.fix_id,
+               joint_table3.fix_status,
+               joint_table3.fix_worker_id,
+               joint_table3.fix_material,
+               joint_table3.fix_material_cost,
+               joint_table3.fix_labor_cost,
+               joint_table3.fix_timeline,
+               joint_table3.fix_user_id,
+               joint_table3.fix_user_name,
+               joint_table3.fix_user_phone,
+               joint_table3.fix_user_address,
+               joint_table3.fix_user_door,
+               joint_table3.fix_expect_time,
+               joint_table3.fix_type,
+               joint_table3.fix_details,
+               joint_table3.fix_picture,
+               joint_table3.fix_submit_time,
+               joint_table3.fix_department_id,
+               joint_table3.fix_department_name,
+               `user`.`name`,
+               `user`.phone
+        FROM (
+                 SELECT joint_table2.fix_order_id,
+                        joint_table2.fix_id,
+                        joint_table2.fix_status,
+                        joint_table2.fix_worker_id,
+                        joint_table2.fix_material,
+                        joint_table2.fix_material_cost,
+                        joint_table2.fix_labor_cost,
+                        joint_table2.fix_timeline,
+                        fix_request.fix_user_id,
+                        fix_request.fix_user_name,
+                        fix_request.fix_user_phone,
+                        fix_request.fix_user_address,
+                        fix_request.fix_user_door,
+                        fix_request.fix_expect_time,
+                        fix_request.fix_type,
+                        fix_request.fix_details,
+                        fix_request.fix_picture,
+                        fix_request.fix_submit_time,
+                        joint_table2.fix_department_id,
+                        joint_table2.fix_department_name
+                 FROM (
+                          SELECT joint_table1.fix_order_id,
+                                 joint_table1.fix_id,
+                                 joint_table1.fix_status,
+                                 joint_table1.fix_worker_id,
+                                 joint_table1.fix_department_id,
+                                 joint_table1.fix_material,
+                                 joint_table1.fix_material_cost,
+                                 joint_table1.fix_labor_cost,
+                                 joint_table1.fix_timeline,
+                                 fix_department.fix_department_name
+                          FROM (
+                                   SELECT fix_order.fix_order_id,
+                                          fix_order.fix_id,
+                                          fix_order.fix_status,
+                                          fix_order.fix_worker_id,
+                                          fix_worker.fix_department_id,
+                                          fix_order.fix_material,
+                                          fix_order.fix_material_cost,
+                                          fix_order.fix_labor_cost,
+                                          fix_order.fix_timeline
+                                   FROM fix_order
+                                            LEFT JOIN fix_worker ON fix_order.fix_worker_id = fix_worker.fix_worker_id
+                               ) AS joint_table1
+                                   LEFT JOIN fix_department
+                                             ON joint_table1.fix_department_id = fix_department.fix_department_id
+                      ) AS joint_table2
+                          LEFT JOIN fix_request ON joint_table2.fix_id = fix_request.fix_id
+             ) AS joint_table3
+                 LEFT JOIN `user` ON joint_table3.fix_worker_id = `user`.uid
+    </select>
+
+    <!--    获取所有维修部门-->
+    <select id="selectAllDepartments" resultMap="FixDepartment">
+        SELECT *
+        FROM `fix_department`
+    </select>
+
+    <!--    获取系统中工单状态个数-->
+    <select id="getFixStatusNumber" resultMap="FixStatusDiagram">
+        SELECT fix_status,
+               COUNT(fix_status) fix_number
+        FROM fix_order
+        GROUP BY fix_status
+        ORDER BY fix_status ASC
+    </select>
+
+    <!--    获取系统中每日被完成工单个数-->
+    <select id="getDailyFixNumber" resultMap="FixDailyDiagram">
+        SELECT fix_worker_id,
+               fix_timeline
+        FROM fix_order
+        WHERE fix_status = 4
+        ORDER BY fix_worker_id
+    </select>
+
+    <!--    获取系统中工作人员完成工单个数-->
+    <select id="getWorkerFixNumber" resultType="FixWorkerDiagram">
+        SELECT `user`.`name`,
+               COUNT(fix_order_id) number
+        FROM fix_order,
+             `user`
+        WHERE fix_status = 4
+          AND fix_order.fix_worker_id = `user`.uid
+        GROUP BY fix_worker_id
+        ORDER BY number DESC
+    </select>
+
+    <!--    获取系统中维修部门完成工单个数-->
+    <select id="getDepartFixNumber" resultType="FixWorkerDiagram">
+        SELECT (fix_department.fix_department_name) `name`,
+               COUNT(fix_order_id)                  number
+        FROM fix_order,
+             fix_worker,
+             fix_department
+        WHERE fix_status = 4
+          AND fix_order.fix_worker_id = fix_worker.fix_worker_id
+          AND fix_worker.fix_department_id = fix_department.fix_department_id
+        GROUP BY fix_department_name
+        ORDER BY number DESC
+    </select>
+
+
+    <!--    获取指定维修部门的所有员工-->
+    <select id="selectAllWorkersByDepartment" resultMap="FixWorker">
+        SELECT w.fix_worker_id,
+               w.fix_department_id,
+               u.account,
+               u.`password`,
+               u.`name`,
+               u.sex,
+               u.age,
+               u.phone,
+               u.id,
+               u.political_face,
+               u.authorization,
+               u.avatar
+        FROM `fix_worker` w,
+             `user` u
+        WHERE w.fix_worker_id = u.uid
+          AND w.fix_department_id = #{fixDepartmentId}
+    </select>
+
+    <!--    指定员工和工单,为其强制派单-->
+    <update id="forceAssignOrder" parameterType="FixOrder">
+        update `fix_order`
+        set `fix_status`= 2,
+            `fix_worker_id` = #{fixWorkerId},
+            `fix_timeline` = concat(`fix_timeline`, #{fixTimeline})
+        where `fix_order_id` = #{fixOrderId}
+    </update>
+
+
+    <!--==========================================================================-->
+    <!--    仅用户使用-->
+    <!--    根据指定的用户id,查询全部维修工单并合并提供该工单的报修详细信息-->
+    <select id="selectAllFixDetailsByUserId" resultMap="FixOrderWithDetails">
+        SELECT *
+        FROM (
+                 SELECT joint_table3.fix_order_id,
+                        joint_table3.fix_id,
+                        joint_table3.fix_status,
+                        joint_table3.fix_worker_id,
+                        joint_table3.fix_material,
+                        joint_table3.fix_material_cost,
+                        joint_table3.fix_labor_cost,
+                        joint_table3.fix_timeline,
+                        joint_table3.fix_user_id,
+                        joint_table3.fix_user_name,
+                        joint_table3.fix_user_phone,
+                        joint_table3.fix_user_address,
+                        joint_table3.fix_user_door,
+                        joint_table3.fix_expect_time,
+                        joint_table3.fix_type,
+                        joint_table3.fix_details,
+                        joint_table3.fix_picture,
+                        joint_table3.fix_submit_time,
+                        joint_table3.fix_department_id,
+                        joint_table3.fix_department_name,
+                        `user`.`name`,
+                        `user`.phone
+                 FROM (
+                          SELECT joint_table2.fix_order_id,
+                                 joint_table2.fix_id,
+                                 joint_table2.fix_status,
+                                 joint_table2.fix_worker_id,
+                                 joint_table2.fix_material,
+                                 joint_table2.fix_material_cost,
+                                 joint_table2.fix_labor_cost,
+                                 joint_table2.fix_timeline,
+                                 fix_request.fix_user_id,
+                                 fix_request.fix_user_name,
+                                 fix_request.fix_user_phone,
+                                 fix_request.fix_user_address,
+                                 fix_request.fix_user_door,
+                                 fix_request.fix_expect_time,
+                                 fix_request.fix_type,
+                                 fix_request.fix_details,
+                                 fix_request.fix_picture,
+                                 fix_request.fix_submit_time,
+                                 joint_table2.fix_department_id,
+                                 joint_table2.fix_department_name
+                          FROM (
+                                   SELECT joint_table1.fix_order_id,
+                                          joint_table1.fix_id,
+                                          joint_table1.fix_status,
+                                          joint_table1.fix_worker_id,
+                                          joint_table1.fix_department_id,
+                                          joint_table1.fix_material,
+                                          joint_table1.fix_material_cost,
+                                          joint_table1.fix_labor_cost,
+                                          joint_table1.fix_timeline,
+                                          fix_department.fix_department_name
+                                   FROM (
+                                            SELECT fix_order.fix_order_id,
+                                                   fix_order.fix_id,
+                                                   fix_order.fix_status,
+                                                   fix_order.fix_worker_id,
+                                                   fix_worker.fix_department_id,
+                                                   fix_order.fix_material,
+                                                   fix_order.fix_material_cost,
+                                                   fix_order.fix_labor_cost,
+                                                   fix_order.fix_timeline
+                                            FROM fix_order
+                                                     LEFT JOIN fix_worker ON fix_order.fix_worker_id = fix_worker.fix_worker_id
+                                        ) AS joint_table1
+                                            LEFT JOIN fix_department
+                                                      ON joint_table1.fix_department_id = fix_department.fix_department_id
+                               ) AS joint_table2
+                                   LEFT JOIN fix_request ON joint_table2.fix_id = fix_request.fix_id
+                      ) AS joint_table3
+                          LEFT JOIN `user` ON joint_table3.fix_worker_id = `user`.uid
+             ) AS joint_table4
+        WHERE joint_table4.fix_user_id = #{fixUserId}
+    </select>
+
+    <!--    新增一个报修申请-->
+    <insert id="addFixRequest" parameterType="FixRequest">
+        insert into `fix_request`(fix_id, fix_user_id, fix_user_name, fix_user_phone, fix_user_address, fix_user_door,
+                                  fix_expect_time, fix_type, fix_details, fix_picture, fix_submit_time)
+        VALUES (#{fixRequest.fixId}, #{fixRequest.fixUserId}, #{fixRequest.fixUserName}, #{fixRequest.fixUserPhone},
+                #{fixRequest.fixUserAddress}, #{fixRequest.fixUserDoor}, #{fixRequest.fixExpectTime},
+                #{fixRequest.fixType}, #{fixRequest.fixDetails}, #{fixRequest.fixPicture}, #{fixRequest.fixSubmitTime})
+    </insert>
+
+    <!--    初始化一个维修工单-->
+    <insert id="addFixOrder" parameterType="FixOrder">
+        insert into `fix_order`(fix_order_id, fix_id, fix_status, fix_worker_id,
+                                fix_material, fix_material_cost, fix_labor_cost, fix_timeline)
+        VALUES (#{fixOrder.fixOrderId}, #{fixOrder.fixId}, 1, null, null, null, null, #{fixOrder.fixTimeline})
+    </insert>
+
+    <!--    根据选中的单号,用户强制关闭工单-->
+    <update id="forceCloseOrder" parameterType="FixOrder">
+        update `fix_order`
+        set `fix_status`= 4,
+            `fix_timeline` = concat(`fix_timeline`, #{fixTimeline})
+        where `fix_order_id` = #{fixOrderId}
+    </update>
+
+    <!--==========================================================================-->
+
+</mapper>

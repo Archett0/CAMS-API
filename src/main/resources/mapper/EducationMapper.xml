@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiangliban.managementsystem.dao.mapper.EducationMapper">
+
+    <resultMap id="Course" type="java.util.HashMap">
+        <id column="course_id" property="courseId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="course_cover" property="courseCover"/>
+        <result column="course_category_id" property="courseCategoryId"/>
+        <result column="course_link" property="courseLink"/>
+        <result column="course_start_time" property="courseStartTime"/>
+        <result column="course_end_time" property="courseEndTime"/>
+        <result column="course_teacher_name" property="courseTeacherName"/>
+        <result column="course_sections" property="courseSections"/>
+        <result column="course_details" property="courseDetails"/>
+        <result column="course_fee" property="courseFee"/>
+        <result column="course_status" property="courseStatus"/>
+        <result column="course_like" property="courseLike"/>
+        <result column="course_category_name" property="courseCategoryName"/>
+    </resultMap>
+
+    <resultMap id="UserCourse" type="java.util.HashMap">
+        <id column="course_id" property="courseId"/>
+        <result column="uid" property="uid"/>
+    </resultMap>
+
+    <resultMap id="CourseCategory" type="java.util.HashMap">
+        <id column="course_category_id" property="courseCategoryId"/>
+        <result column="course_category_name" property="courseCategoryName"/>
+    </resultMap>
+
+    <resultMap id="CourseDiagram" type="java.util.HashMap">
+        <id column="course_name" property="courseName"/>
+        <result column="pplSelected" property="coursePplNumber"/>
+    </resultMap>
+
+    <resultMap id="CoursePieDiagram" type="java.util.HashMap">
+        <id column="course_category_name" property="courseCategoryName"/>
+        <result column="pplSelected" property="coursePplNumber"/>
+    </resultMap>
+
+    <!--==========================================================================-->
+    <!--    仅管理员使用-->
+    <!--    查询所有课程类别-->
+    <select id="selectAllCourseCategory" resultMap="CourseCategory">
+        SELECT *
+        FROM course_category
+    </select>
+
+    <!--    新增一个课程类别-->
+    <insert id="addCourseCategory" parameterType="CourseCategory">
+        INSERT INTO course_category
+        VALUES (#{courseCategoryId}, #{courseCategoryName})
+    </insert>
+
+    <!--    更改一个课程类别-->
+    <update id="alterCourseCategoryNameById" parameterType="CourseCategory">
+        UPDATE course_category
+        SET course_category_name = #{courseCategoryName}
+        WHERE course_category_id = #{courseCategoryId}
+    </update>
+
+    <!--    删除一个课程类别-->
+    <delete id="deleteCourseCategory" parameterType="CourseCategory">
+        DELETE
+        FROM course_category
+        WHERE course_category_id = #{courseCategoryId}
+    </delete>
+
+    <!--==========================================================================-->
+    <!--    仅工作人员使用-->
+    <!--    查询所有课程信息-->
+    <select id="selectAllCourses" resultMap="Course">
+        SELECT course.course_id,
+               course.course_name,
+               course.course_cover,
+               course.course_category_id,
+               course_category.course_category_name,
+               course.course_link,
+               course.course_start_time,
+               course.course_end_time,
+               course.course_teacher_name,
+               course.course_sections,
+               course.course_details,
+               course.course_fee,
+               course.course_status,
+               course.course_like
+        FROM course
+                 LEFT JOIN course_category
+                           ON course.course_category_id = course_category.course_category_id
+    </select>
+
+    <!--    新增一个课程-->
+    <insert id="addNewCourse" parameterType="Course">
+        INSERT INTO course
+        VALUES (#{courseId}, #{courseName}, #{courseCover}, #{courseCategoryId},
+                #{courseLink}, #{courseStartTime}, #{courseEndTime}, #{courseTeacherName},
+                #{courseSections}, #{courseDetails}, #{courseFee}, #{courseStatus},
+                #{courseLike})
+    </insert>
+
+    <!--    根据指定的id更新课程信息-->
+    <update id="alterCourseById" parameterType="Course">
+        UPDATE course
+        SET course_name         = #{courseName},
+            course_cover        = #{courseCover},
+            course_category_id  = #{courseCategoryId},
+            course_link         = #{courseLink},
+            course_start_time   = #{courseStartTime},
+            course_end_time     = #{courseEndTime},
+            course_teacher_name = #{courseTeacherName},
+            course_sections     = #{courseSections},
+            course_details      = #{courseDetails},
+            course_fee          = #{courseFee},
+            course_status       = #{courseStatus},
+            course_like         = #{courseLike}
+        WHERE course_id = #{courseId}
+    </update>
+
+    <!--    删除一个课程-->
+    <delete id="deleteCourseById" parameterType="Course">
+        DELETE
+        FROM course
+        WHERE course_id = #{courseId}
+    </delete>
+
+    <!--    根据指定的id查看课程选课人数-->
+    <select id="getNumberOfPplSelected" resultType="java.lang.Integer">
+        SELECT COUNT(uid) pplSelected
+        FROM `user_course`
+        WHERE course_id = #{courseId}
+    </select>
+
+    <!--    查看所有课程选课人数-->
+    <select id="getAllCoursePplSelected" resultMap="CourseDiagram">
+        SELECT course_name,
+               COUNT(uid) pplSelected
+        FROM user_course,
+             course
+        WHERE course.course_id = user_course.course_id
+        GROUP BY course.course_id
+    </select>
+
+    <!--    查看所有课程类别选课人数-->
+    <select id="getAllCourseCategorySelected" resultMap="CoursePieDiagram">
+        SELECT course_category_name, COUNT(uid) pplSelected
+        FROM course_category,
+             course,
+             user_course
+        WHERE course_category.course_category_id = course.course_category_id
+          AND course.course_id = user_course.course_id
+        GROUP BY course_category.course_category_id
+    </select>
+
+    <!--==========================================================================-->
+    <!--    仅用户使用-->
+    <!--    根据当前用户id获取所有参与的课程-->
+    <select id="selectAllCourseByUserId" resultMap="Course">
+        SELECT course.course_id,
+               course.course_name,
+               course.course_cover,
+               course.course_category_id,
+               course_category.course_category_name,
+               course.course_link,
+               course.course_start_time,
+               course.course_end_time,
+               course.course_teacher_name,
+               course.course_sections,
+               course.course_details,
+               course.course_fee,
+               course.course_status,
+               course.course_like
+        FROM course
+                 LEFT JOIN course_category ON course.course_category_id = course_category.course_category_id
+                 INNER JOIN user_course ON course.course_id = user_course.course_id
+            AND user_course.uid = #{uid}
+    </select>
+
+    <!--    根据课程类别获取相关的课程-->
+    <select id="selectAllCourseByCategoryId" resultMap="Course">
+        SELECT course.course_id,
+               course.course_name,
+               course.course_cover,
+               course.course_category_id,
+               course_category.course_category_name,
+               course.course_link,
+               course.course_start_time,
+               course.course_end_time,
+               course.course_teacher_name,
+               course.course_sections,
+               course.course_details,
+               course.course_fee,
+               course.course_status,
+               course.course_like
+        FROM course,
+             course_category
+        WHERE course.course_category_id = course_category.course_category_id
+          AND course_category.course_category_id = #{courseCategoryId}
+    </select>
+
+    <!--    根据课程号获取一个课程-->
+    <select id="selectCourseById" resultMap="Course">
+        SELECT course.course_id,
+               course.course_name,
+               course.course_cover,
+               course.course_category_id,
+               course_category.course_category_name,
+               course.course_link,
+               course.course_start_time,
+               course.course_end_time,
+               course.course_teacher_name,
+               course.course_sections,
+               course.course_details,
+               course.course_fee,
+               course.course_status,
+               course.course_like
+        FROM course,
+             course_category
+        WHERE course.course_category_id = course_category.course_category_id
+          AND course.course_id = #{courseId}
+    </select>
+
+    <!--    新参与一个课程-->
+    <insert id="addMyCourse" parameterType="UserCourse">
+        INSERT INTO user_course
+        VALUES (#{courseId}, #{uid})
+    </insert>
+
+    <!--    取消参与一个课程-->
+    <delete id="deleteMyCourse" parameterType="UserCourse">
+        DELETE
+        FROM user_course
+        WHERE course_id = #{courseId}
+          AND uid = #{uid}
+    </delete>
+
+    <!--==========================================================================-->
+</mapper>

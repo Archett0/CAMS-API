@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiangliban.managementsystem.dao.mapper.UserMapper">
+
+    <resultMap id="User" type="java.util.HashMap">
+        <id column="uid" property="uid"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="age" property="age"/>
+        <result column="phone" property="phone"/>
+        <result column="id" property="id"/>
+        <result column="political_face" property="political_face"/>
+        <result column="authorization" property="authorization"/>
+        <result column="avatar" property="avatar"/>
+    </resultMap>
+
+    <!--==========================================================================-->
+    <!--    查询所有用户信息-->
+    <select id="selectAllUsers" resultMap="User">
+        SELECT *
+        FROM `user`
+    </select>
+
+    <!--    新增一个用户-->
+    <insert id="addNewUser" parameterType="User">
+        INSERT INTO `user`
+        VALUES (#{user.uid},
+                #{user.account},
+                #{user.password},
+                #{user.name},
+                #{user.sex},
+                #{user.age},
+                #{user.phone},
+                #{user.id},
+                #{user.political_face},
+                #{user.authorization},
+                #{user.avatar})
+    </insert>
+
+    <!--    更新一个用户-->
+    <update id="updateUser" parameterType="User">
+        UPDATE `user`
+        SET `account`        = #{user.account},
+            `password`       = #{user.password},
+            `name`           = #{user.name},
+            `sex`            = #{user.sex},
+            `age`            = #{user.age},
+            `phone`          = #{user.phone},
+            `id`             = #{user.id},
+            `political_face` = #{user.political_face},
+            `authorization`  = #{user.authorization},
+            `avatar`         = #{user.avatar}
+        WHERE `uid` = #{user.uid}
+    </update>
+
+    <!--    更新用户权限-->
+    <update id="updateUserAuthorization" parameterType="User">
+        UPDATE `user`
+        SET `authorization` = #{authorization}
+        WHERE `uid` = #{uid}
+    </update>
+
+    <!--    根据用户uid查询用户-->
+    <select id="selectUserByUid" resultType="User">
+        SELECT *
+        FROM `user`
+        WHERE `user`.uid = #{uid}
+    </select>
+
+    <!--    根据用户account查询用户-->
+    <select id="selectUserByAccount" resultType="User">
+        SELECT *
+        FROM `user`
+        WHERE `user`.account = #{account}
+    </select>
+
+    <!--    根据用户account&password验证用户-->
+    <select id="userLoginByAccount" resultType="User">
+        SELECT *
+        FROM `user`
+        WHERE `user`.account = #{account}
+          AND `user`.password = #{password}
+    </select>
+
+    <!--    删除一个用户: 不使用级联, 故可能会无法成功删除-->
+    <delete id="deleteUserByUid" parameterType="User">
+        DELETE
+        FROM `user`
+        WHERE `user`.uid = #{uid}
+    </delete>
+
+    <!--    查询所有村民信息-->
+    <select id="selectAllVillagers" resultType="User">
+        SELECT *
+        FROM `user`
+        WHERE `user`.authorization = 1
+    </select>
+
+    <!--==========================================================================-->
+</mapper>
