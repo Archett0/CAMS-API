@@ -103,7 +103,7 @@ public class UserController {
 
     @ApiOperation("更新用户权限")
     @PostMapping("/user/updateUserAuthorization")
-    public void updateUser(String uid, int authorization) {
+    public void updateUser(String uid, Integer authorization) {
         userService.updateUserAuthorization(uid, authorization);
     }
 

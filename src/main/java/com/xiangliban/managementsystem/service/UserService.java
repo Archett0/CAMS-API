@@ -22,6 +22,14 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    public UserMapper getUserMapper() {
+        return userMapper;
+    }
+
+    public void setUserMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
     // 查询
     // 查询所有用户信息
     public List<User> selectAllUsers() {
@@ -50,6 +58,9 @@ public class UserService {
 
     // 新增一个用户
     public String addNewUser(User user) {
+        if(user.getAccount() == null){
+            return "";
+        }
         String uid = "User#";
         uid += NameGenerator.nameGenerator(6);
         user.setUid(uid);
@@ -63,8 +74,12 @@ public class UserService {
     }
 
     // 更新用户权限
-    public void updateUserAuthorization(String uid, int authorization) {
+    public int updateUserAuthorization(String uid, Integer authorization) {
+        if(authorization == null || authorization == 0 || authorization < 1 || authorization > 13){
+            return 0;
+        }
         userMapper.updateUserAuthorization(uid, authorization);
+        return 1;
     }
 
     // 删除一个用户

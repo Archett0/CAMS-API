@@ -43,7 +43,7 @@ public interface UserMapper {
     void updateUser(@Param("user") User user);
 
     // 更新用户权限
-    void updateUserAuthorization(String uid, int authorization);
+    int updateUserAuthorization(String uid, Integer authorization);
 
     // 删除一个用户
     void deleteUserByUid(String uid);

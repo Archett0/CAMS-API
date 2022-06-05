@@ -61,14 +61,14 @@ public interface FixMapper {
 
     // 添加与初始化
     // 新增一个报修申请
-    void addFixRequest(@Param("fixRequest") FixRequest fixRequest);
+    int addFixRequest(@Param("fixRequest") FixRequest fixRequest);
 
     // 初始化一个维修工单
     void addFixOrder(@Param("fixOrder") FixOrder fixOrder);
 
     // 修改
     // 根据选中的单号进行接单,即将订单状态修改为2已派单并自动填入工作人员id
-    void takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixTimeline, String fixOrderId);
+    int takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixTimeline, String fixOrderId);
 
     // 工作人员出发,即将订单状态修改为3进行中并自动填入时间线
     void ongoingOrderByOrderId(String fixTimeline, String fixOrderId);
@@ -77,10 +77,10 @@ public interface FixMapper {
     void endOrderByOrderIdAndInfo(String fixMaterial, String fixMaterialCost, String fixLaborCost, String fixTimeline, String fixOrderId);
 
     // 根据选中的单号,强制关闭工单
-    void forceCloseOrder(String fixOrderId, String fixTimeline);
+    int forceCloseOrder(String fixOrderId, String fixTimeline);
 
     // 指定员工和工单,为其强制派单
-    void forceAssignOrder(String fixWorkerId, String fixTimeline, String fixOrderId);
+    int forceAssignOrder(String fixWorkerId, String fixTimeline, String fixOrderId);
 
 
     // 删除（可能并不有这个需求）

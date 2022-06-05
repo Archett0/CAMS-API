@@ -23,6 +23,14 @@ public class FixService {
     @Autowired
     private FixMapper fixMapper;
 
+    public FixMapper getFixMapper() {
+        return fixMapper;
+    }
+
+    public void setFixMapper(FixMapper fixMapper) {
+        this.fixMapper = fixMapper;
+    }
+
     // 查询
     // 根据指定的维修人员id,查询维修工单并合并提供该工单的报修详细信息
     public List<FixOrderWithDetails> selectAllFixDetailsByWorkerId(String fixWorkerId) {
@@ -142,8 +150,9 @@ public class FixService {
 
     // 修改
     // 根据选中的单号进行接单,即将订单状态修改为2已派单并自动填入工作人员id
-    public void takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixTimeline, String fixOrderId) {
+    public int takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixTimeline, String fixOrderId) {
         fixMapper.takeOrderByOrderIdAndWorkerId(fixWorkerId, fixTimeline, fixOrderId);
+        return 1;
     }
 
     // 工作人员出发,即将订单状态修改为3进行中并自动填入时间线
@@ -157,13 +166,15 @@ public class FixService {
     }
 
     // 根据选中的单号,强制关闭工单
-    public void forceCloseOrder(String fixOrderId, String fixTimeline) {
+    public int forceCloseOrder(String fixOrderId, String fixTimeline) {
         fixMapper.forceCloseOrder(fixOrderId, fixTimeline);
+        return 1;
     }
 
     // 指定员工和工单,为其强制派单
-    public void forceAssignOrder(String fixWorkerId, String fixTimeline, String fixOrderId) {
+    public int forceAssignOrder(String fixWorkerId, String fixTimeline, String fixOrderId) {
         fixMapper.forceAssignOrder(fixWorkerId, fixTimeline, fixOrderId);
+        return 1;
     }
 
 }
