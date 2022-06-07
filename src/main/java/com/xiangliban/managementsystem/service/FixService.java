@@ -34,6 +34,9 @@ public class FixService {
     // 查询
     // 根据指定的维修人员id,查询维修工单并合并提供该工单的报修详细信息
     public List<FixOrderWithDetails> selectAllFixDetailsByWorkerId(String fixWorkerId) {
+        if(fixWorkerId == null || fixWorkerId.length() == 0 || fixWorkerId.length() > 11){
+            return new ArrayList<>();
+        }
         return fixMapper.selectAllFixDetailsByWorkerId(fixWorkerId);
     }
 
@@ -127,6 +130,9 @@ public class FixService {
 
     // 获取指定维修部门的所有员工
     public List<FixWorker> selectAllWorkersByDepartment(String fixDepartmentId) {
+        if(fixDepartmentId == null || fixDepartmentId.length() == 0 || fixDepartmentId.length() > 11){
+            return new ArrayList<>();
+        }
         return fixMapper.selectAllWorkersByDepartment(fixDepartmentId);
     }
 
@@ -151,6 +157,10 @@ public class FixService {
     // 修改
     // 根据选中的单号进行接单,即将订单状态修改为2已派单并自动填入工作人员id
     public int takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixTimeline, String fixOrderId) {
+        if((fixWorkerId == null || fixWorkerId.length() == 0 || fixWorkerId.length() > 11)
+                ||(fixOrderId == null || fixOrderId.length() == 0 || fixOrderId.length() > 11)){
+            return 0;
+        }
         fixMapper.takeOrderByOrderIdAndWorkerId(fixWorkerId, fixTimeline, fixOrderId);
         return 1;
     }
@@ -167,12 +177,19 @@ public class FixService {
 
     // 根据选中的单号,强制关闭工单
     public int forceCloseOrder(String fixOrderId, String fixTimeline) {
+        if(fixOrderId == null || fixOrderId.length() == 0 || fixOrderId.length() > 11){
+            return 0;
+        }
         fixMapper.forceCloseOrder(fixOrderId, fixTimeline);
         return 1;
     }
 
     // 指定员工和工单,为其强制派单
     public int forceAssignOrder(String fixWorkerId, String fixTimeline, String fixOrderId) {
+        if((fixWorkerId == null || fixWorkerId.length() == 0 || fixWorkerId.length() > 11)
+                ||(fixOrderId == null || fixOrderId.length() == 0 || fixOrderId.length() > 11)){
+            return 0;
+        }
         fixMapper.forceAssignOrder(fixWorkerId, fixTimeline, fixOrderId);
         return 1;
     }

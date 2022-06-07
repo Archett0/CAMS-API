@@ -23,32 +23,43 @@ import static org.junit.Assert.assertEquals;
 @RunWith(value = Parameterized.class)
 public class UserServiceTest3 {
     private String userAccount;
-    private String userPassword;
+    private String userPassword;    private int valid;
+
 
     private UserService userService;
     private UserMapper userMapper;
 
-    public UserServiceTest3(String userAccount,String userPassword) {
+    public UserServiceTest3(String userAccount,String userPassword, int valid) {
 
         this.userAccount = userAccount;
-        this.userPassword = userPassword;
+        this.userPassword = userPassword;        this.valid = valid;
+
     }
 
     @Parameterized.Parameters(name = "{index}: userAccount = {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                // 等价类划分
-                {"user1","user1"},
-                {null,null},
-                {"",""},
-                {"wixnhishyhde","wixnhishyhde"},
+                // 等价类划
+                {"user1","user1",1},
+                {null,"user1",0},
+                {"","user1",0},
+                {"user31231312","user1",0},
+                {"user1",null,0},
+                {"user1","",0},
+                {"user1","user112313132",0},
                 // 边界值分析
-                {"",""},
-                {"1","1"},
-                {"11","11"},
-                {"1111111111","1111111111"},
-                {"11111111111","11111111111"},
-                {"111111111111","111111111111"},
+                {"","user1",0},
+                {"1","user1",1},
+                {"11","user1",1},
+                {"1111111111","user1",1},
+                {"11111111111","user1",1},
+                {"111111111111","user1",0},
+                {"user1","",0},
+                {"user1","1",1},
+                {"user1","11",1},
+                {"user1","1111111111",1},
+                {"user1","11111111111",1},
+                {"user1","111111111111",0},
         });
     }
 
@@ -63,26 +74,29 @@ public class UserServiceTest3 {
     public void tearDown() throws Exception {
     }
 
-    public ArrayList<User> returnOfUserLoginByAccount() {
+    public ArrayList<User> returnOfUserLoginByAccount(int valid) {
 
         ArrayList<User> msr = new ArrayList<>();
-        User r = new User();
-        r.setAccount("");
-        r.setUid("user1");
-        msr.add(r);
+        if (valid == 1) {
+            User r = new User();
+            r.setAccount("");
+            r.setUid("demo");
+            msr.add(r);
+        }
         return msr;
     }
 
     @org.junit.Test
     public void userLoginByAccount() {
 
-        ArrayList<User> msr = returnOfUserLoginByAccount();
+        ArrayList<User> msr = returnOfUserLoginByAccount(valid);
 
         expect(userMapper.userLoginByAccount(userAccount,userPassword)).andReturn(msr);
         replay(userMapper);
 
         assertEquals(msr, userService.userLoginByAccount(userAccount,userPassword));
-        verify(userMapper);
+        if((userAccount != null && userAccount.length() != 0 && userAccount.length() <= 11)&&(userPassword != null && userPassword.length() != 0 && userPassword.length() <= 11))
+            verify(userMapper);
     }
 
 }

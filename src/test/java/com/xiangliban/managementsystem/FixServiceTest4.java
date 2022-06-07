@@ -3,7 +3,7 @@ package com.xiangliban.managementsystem;
 /**
  * @Author: Cooper Liu
  * @Description:
- * @Date: Created at 19:57 2022/6/5
+ * @Date: Created at 20:07 2022/6/5
  * @Modified by:
  */
 
@@ -21,33 +21,33 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(value = Parameterized.class)
 public class FixServiceTest4 {
-
-    private String userId;
     private String orderId;
+    private int valid;
 
     private FixService fixService;
     private FixMapper rentMapper;
 
-    public FixServiceTest4(String userId, String orderId) {
-        this.userId = userId;
+    public FixServiceTest4(String orderId, int valid) {
         this.orderId = orderId;
+        this.valid = valid;
     }
 
-    @Parameterized.Parameters(name = "{index}: orderId = {0}")
+    @Parameterized.Parameters(name = "{index}: order = {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // 等价类划分
-                {"user#1","order#1"},
-                {"user#1",""},
-                {"",""},
-                {"wixnhishyhde","order#1"},
+                {"order#1", 1},
+                {null, 0},
+                {"", 0},
+                {"order#1313131312", 0},
                 // 边界值分析
-                {"",""},
-                {"1","1"},
-                {"11","11"},
-                {"1111111111","1111111111"},
-                {"11111111111","11111111111"},
-                {"111111111111","111111111111"},
+                {"", 0},
+                {"1", 1},
+                {"11", 1},
+                {"1111111111", 1},
+                {"11111111111", 1},
+                {"111111111111", 0},
+
         });
     }
 
@@ -62,21 +62,22 @@ public class FixServiceTest4 {
     public void tearDown() throws Exception {
     }
 
-    public int returnOfTakeOrderByOrderIdAndWorkerId() {
+    public int returnOfForceCloseOrder(int valid) {
 
-        return 1;
+        return valid;
     }
 
     @org.junit.Test
-    public void takeOrderByOrderIdAndWorkerId() {
+    public void forceCloseOrder() {
 
-        int msr = returnOfTakeOrderByOrderIdAndWorkerId();
+        int msr = returnOfForceCloseOrder(valid);
 
-        expect(rentMapper.takeOrderByOrderIdAndWorkerId(userId,"",orderId)).andReturn(msr);
+        expect(rentMapper.forceCloseOrder(orderId, "")).andReturn(msr);
         replay(rentMapper);
 
-        assertEquals(msr, fixService.takeOrderByOrderIdAndWorkerId(userId,"",orderId));
-        verify(rentMapper);
+        assertEquals(msr, fixService.forceCloseOrder(orderId, ""));
+        if (orderId != null && orderId.length() != 0 && orderId.length() <= 11)
+            verify(rentMapper);
     }
 
 }

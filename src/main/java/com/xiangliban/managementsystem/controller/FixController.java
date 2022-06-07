@@ -126,12 +126,16 @@ public class FixController {
 
     @ApiOperation("根据选中的单号进行接单,即将订单状态修改为2已派单并自动填入工作人员id [Worker Only]")
     @PostMapping("/fix/takeOrderByOrderIdAndWorkerId")
-    public void takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixOrderId) {
+    public int takeOrderByOrderIdAndWorkerId(String fixWorkerId, String fixOrderId) {
         // 生成当前时间节点
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss 已派单%");
         String currentStatus = tempDate.format(new java.util.Date());
 //        currentStatus += (fixWorkerDepartment + "|" + fixWorkerName + "%");
-        fixService.takeOrderByOrderIdAndWorkerId(fixWorkerId, currentStatus, fixOrderId);
+        int res = fixService.takeOrderByOrderIdAndWorkerId(fixWorkerId, currentStatus, fixOrderId);
+        if(res == 1){
+            return 1;
+        }
+        return 0;
     }
 
     @ApiOperation("工作人员出发,即将订单状态修改为3进行中并自动填入时间线 [Worker Only]")

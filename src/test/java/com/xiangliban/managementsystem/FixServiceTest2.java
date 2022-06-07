@@ -25,29 +25,32 @@ import static org.junit.Assert.*;
 public class FixServiceTest2 {
 
     private String fixDepartmentId;
+    private int valid;
 
     private FixService fixService;
     private FixMapper rentMapper;
 
-    public FixServiceTest2(String fixDepartmentId) {
+    public FixServiceTest2(String fixDepartmentId, int valid) {
         this.fixDepartmentId = fixDepartmentId;
+        this.valid = valid;
     }
 
     @Parameterized.Parameters(name = "{index}: fixDepartmentId = {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // 等价类划分
-                {"fixDep#1"},
-                {null},
-                {""},
-                {"wixnhishyhde"},
+                {"fixDep#1", 1},
+                {null, 0},
+                {"", 0},
+                {"fixDep#1313131312", 0},
                 // 边界值分析
-                {""},
-                {"1"},
-                {"11"},
-                {"1111111111"},
-                {"11111111111"},
-                {"111111111111"},
+                {"", 0},
+                {"1", 1},
+                {"11", 1},
+                {"1111111111", 1},
+                {"11111111111", 1},
+                {"111111111111", 0},
+
         });
     }
 
@@ -62,26 +65,30 @@ public class FixServiceTest2 {
     public void tearDown() throws Exception {
     }
 
-    public ArrayList<FixWorker> returnOfSelectAllWorkersByDepartment() {
+    public ArrayList<FixWorker> returnOfSelectAllWorkersByDepartment(int valid) {
 
         ArrayList<FixWorker> msr = new ArrayList<>();
-        FixWorker r = new FixWorker();
-        r.setAccount("");
-        r.setAvatar("demo");
-        msr.add(r);
+        if (valid == 1) {
+
+            FixWorker r = new FixWorker();
+            r.setAccount("");
+            r.setAvatar("demo");
+            msr.add(r);
+        }
         return msr;
     }
 
     @org.junit.Test
     public void selectAllWorkersByDepartment() {
 
-        ArrayList<FixWorker> msr = returnOfSelectAllWorkersByDepartment();
+        ArrayList<FixWorker> msr = returnOfSelectAllWorkersByDepartment(valid);
 
         expect(rentMapper.selectAllWorkersByDepartment(fixDepartmentId)).andReturn(msr);
         replay(rentMapper);
 
         assertEquals(msr, fixService.selectAllWorkersByDepartment(fixDepartmentId));
-        verify(rentMapper);
+        if(fixDepartmentId != null && fixDepartmentId.length() != 0 && fixDepartmentId.length() <= 11)
+            verify(rentMapper);
     }
 
 

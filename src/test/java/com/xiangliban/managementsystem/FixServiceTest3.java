@@ -3,14 +3,12 @@ package com.xiangliban.managementsystem;
 /**
  * @Author: Cooper Liu
  * @Description:
- * @Date: Created at 19:01 2022/6/5
+ * @Date: Created at 19:57 2022/6/5
  * @Modified by:
  */
 
 import com.xiangliban.managementsystem.dao.mapper.FixMapper;
-import com.xiangliban.managementsystem.pojo.Fix.FixRequest;
 import com.xiangliban.managementsystem.service.FixService;
-import com.xiangliban.managementsystem.service.IdConsturctor;
 import org.easymock.EasyMock;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -24,43 +22,43 @@ import static org.junit.Assert.assertEquals;
 @RunWith(value = Parameterized.class)
 public class FixServiceTest3 {
 
-    private FixRequest fixRequest;
+    private String userId;
+    private String orderId;
+    private int valid;
 
     private FixService fixService;
     private FixMapper rentMapper;
 
-    public FixServiceTest3(FixRequest fixRequest) {
-        this.fixRequest = fixRequest;
+    public FixServiceTest3(String userId, String orderId, int valid) {
+        this.userId = userId;
+        this.orderId = orderId;
+        this.valid = valid;
     }
 
-    @Parameterized.Parameters(name = "{index}: testOrder = {0}")
+    @Parameterized.Parameters(name = "{index}: orderId = {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // 等价类划分
-                {new FixRequest("123", "2022-01-01", "#1", "url", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "123")},
-                {new FixRequest("123", "2022-01-01", "#1", "url", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "123")},
-                {new FixRequest("", "2022-01-01", "#1", "url", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("124hu1h", "", "#1", "url", "2022-03-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123asd", "2022-01-01", "", "url", "2022-01-01", "Shanghai", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-03-01", "#1", "", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("1wqe23", "2022-01-03", "#1", "url123", "", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-01-01", "#1", "url", "2022-03-01", "", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("1zda23", "2022-07-01", "#1", "url2141", "2022-01-01", "Beijing", "", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("12XZ3", "2022-01-05", "#1", "url14131", "2022-02-02", "Zhejiang", "19th floor", "", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-02-02", "#1", "url124123", "2022-01-01", "Qinghai", "18th floor", "#12", "", "1398298398", "")},
-                {new FixRequest("12zxz3", "2022-01-05", "#1", "url51432", "2022-02-02", "Dalian", "3rd floor", "#12", "Jack", "", "")},
+                {"user#1","order#1",1},
+                {null,"order#1",0},
+                {"","order#1",0},
+                {"user31231312","order#1",0},
+                {"user#1",null,0},
+                {"user#1","",0},
+                {"user#1","order#112313132",0},
                 // 边界值分析
-                {new FixRequest("123", "2022-01-01", "#1", "url", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("", "2022-01-01", "#1", "url", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("124hu1h", "", "#1", "url", "2022-03-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123asd", "2022-01-01", "", "url", "2022-01-01", "Shanghai", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-03-01", "#1", "", "2022-01-01", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("1wqe23", "2022-01-03", "#1", "url123", "", "Zhejiang", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-01-01", "#1", "url", "2022-03-01", "", "2nd floor", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("1zda23", "2022-07-01", "#1", "url2141", "2022-01-01", "Beijing", "", "#12", "Jack", "1398298398", "")},
-                {new FixRequest("12XZ3", "2022-01-05", "#1", "url14131", "2022-02-02", "Zhejiang", "19th floor", "", "Jack", "1398298398", "")},
-                {new FixRequest("123", "2022-02-02", "#1", "url124123", "2022-01-01", "Qinghai", "18th floor", "#12", "", "1398298398", "")},
-                {new FixRequest("12zxz3", "2022-01-05", "#1", "url51432", "2022-02-02", "Dalian", "3rd floor", "#12", "Jack", "", "")},
+                {"","user1",0},
+                {"1","user1",1},
+                {"11","user1",1},
+                {"1111111111","user1",1},
+                {"11111111111","user1",1},
+                {"111111111111","user1",0},
+                {"order1","",0},
+                {"order1","1",1},
+                {"order1","11",1},
+                {"order1","1111111111",1},
+                {"order1","11111111111",1},
+                {"order1","111111111111",0},
         });
     }
 
@@ -75,19 +73,22 @@ public class FixServiceTest3 {
     public void tearDown() throws Exception {
     }
 
-    public String returnOfAddFixRequest() {
+    public int returnOfTakeOrderByOrderIdAndWorkerId(int valid) {
 
-        return IdConsturctor.idConsturctor();
+        return valid;
     }
 
     @org.junit.Test
-    public void selectAllWorkersByDepartment() {
+    public void takeOrderByOrderIdAndWorkerId() {
 
-        String msr = returnOfAddFixRequest();
-        expect(rentMapper.addFixRequest(fixRequest)).andReturn(1);
+        int msr = returnOfTakeOrderByOrderIdAndWorkerId(valid);
+
+        expect(rentMapper.takeOrderByOrderIdAndWorkerId(userId,"",orderId)).andReturn(msr);
         replay(rentMapper);
 
-        assertEquals(msr, fixService.addFixRequest(fixRequest));
-        verify(rentMapper);
+        assertEquals(msr, fixService.takeOrderByOrderIdAndWorkerId(userId,"",orderId));
+        if((userId != null && userId.length() != 0 && userId.length() <= 11)&&(orderId != null && orderId.length() != 0 && orderId.length() <= 11))
+            verify(rentMapper);
     }
+
 }

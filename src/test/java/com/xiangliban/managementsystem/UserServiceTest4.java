@@ -39,17 +39,25 @@ public class UserServiceTest4 {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // 等价类划分
-                {"user#1", 1, 1},
-                {null, 0, 0},
-                {"", 0, 0},
-                {"wixnhishyhde", 14, 0},
+                {"user#1", 2, 1},
+                {null, 1, 0},
+                {"", 1, 0},
+                {"wixnhishyhde", 1, 0},
+                {"user#1", 0, 0},
+                {"user#1", 14, 0},
                 // 边界值分析
-                {"", 0, 0},
+                {"", 1, 0},
                 {"1", 1, 1},
-                {"11", 2, 1},
-                {"1111111111", 12, 1},
-                {"11111111111", 13, 1},
-                {"111111111111", 14, 0},
+                {"11", 1, 1},
+                {"1111111111", 1, 1},
+                {"11111111111", 1, 1},
+                {"111111111111", 1, 0},
+                {"user1", 0, 0},
+                {"user1", 1, 1},
+                {"user1", 2, 1},
+                {"user1", 12, 1},
+                {"user1", 13, 1},
+                {"user1", 14, 0},
         });
     }
 
@@ -66,10 +74,7 @@ public class UserServiceTest4 {
 
     public int returnOfUpdateUserAuthorization(int valid) {
 
-        if (valid == 1) {
-            return 1;
-        }
-        return 0;
+        return valid;
     }
 
     @org.junit.Test
@@ -81,7 +86,7 @@ public class UserServiceTest4 {
         replay(userMapper);
 
         assertEquals(msr, userService.updateUserAuthorization(userId, authorization));
-        if(msr == 1)
+        if ((authorization > 0 && authorization < 14) && (userId != null && userId.length() != 0 && userId.length() <= 11))
             verify(userMapper);
     }
 

@@ -22,30 +22,32 @@ import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class UserServiceTest2 {
-    private String userAccount;
+    private String userAccount;    private int valid;
+
 
     private UserService userService;
     private UserMapper userMapper;
 
-    public UserServiceTest2(String userAccount) {
-        this.userAccount = userAccount;
+    public UserServiceTest2(String userAccount, int valid) {
+        this.userAccount = userAccount;        this.valid = valid;
+
     }
 
     @Parameterized.Parameters(name = "{index}: userAccount = {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // 等价类划分
-                {"user1"},
-                {null},
-                {""},
-                {"wixnhishyhde"},
+                {"user1", 1},
+                {null, 0},
+                {"", 0},
+                {"user#1313131312", 0},
                 // 边界值分析
-                {""},
-                {"1"},
-                {"11"},
-                {"1111111111"},
-                {"11111111111"},
-                {"111111111111"},
+                {"", 0},
+                {"1", 1},
+                {"11", 1},
+                {"1111111111", 1},
+                {"11111111111", 1},
+                {"111111111111", 0},
         });
     }
 
@@ -60,25 +62,28 @@ public class UserServiceTest2 {
     public void tearDown() throws Exception {
     }
 
-    public ArrayList<User> returnOfSelectUserByAccount() {
+    public ArrayList<User> returnOfSelectUserByAccount(int valid) {
 
         ArrayList<User> msr = new ArrayList<>();
-        User r = new User();
-        r.setAccount("");
-        r.setUid("user1");
-        msr.add(r);
+        if (valid == 1) {
+            User r = new User();
+            r.setAccount("");
+            r.setUid("demo");
+            msr.add(r);
+        }
         return msr;
     }
 
     @org.junit.Test
     public void selectUserByAccount() {
 
-        ArrayList<User> msr = returnOfSelectUserByAccount();
+        ArrayList<User> msr = returnOfSelectUserByAccount(valid);
 
         expect(userMapper.selectUserByAccount(userAccount)).andReturn(msr);
         replay(userMapper);
 
         assertEquals(msr, userService.selectUserByAccount(userAccount));
+        if(userAccount != null && userAccount.length() != 0 && userAccount.length() <= 11)
         verify(userMapper);
     }
 
