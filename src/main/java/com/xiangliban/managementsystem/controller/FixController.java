@@ -131,11 +131,7 @@ public class FixController {
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss 已派单%");
         String currentStatus = tempDate.format(new java.util.Date());
 //        currentStatus += (fixWorkerDepartment + "|" + fixWorkerName + "%");
-        int res = fixService.takeOrderByOrderIdAndWorkerId(fixWorkerId, currentStatus, fixOrderId);
-        if(res == 1){
-            return 1;
-        }
-        return 0;
+        return fixService.takeOrderByOrderIdAndWorkerId(fixWorkerId, currentStatus, fixOrderId);
     }
 
     @ApiOperation("工作人员出发,即将订单状态修改为3进行中并自动填入时间线 [Worker Only]")
@@ -161,20 +157,20 @@ public class FixController {
 
     @ApiOperation("根据选中的单号,强制关闭工单   [Villager Only]")
     @PostMapping("/fix/forceCloseOrder")
-    public void forceCloseOrder(String fixOrderId) {
+    public int forceCloseOrder(String fixOrderId) {
         // 生成当前时间节点
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss 用户关闭工单%");
         String currentStatus = tempDate.format(new java.util.Date());
-        fixService.forceCloseOrder(fixOrderId, currentStatus);
+        return fixService.forceCloseOrder(fixOrderId, currentStatus);
     }
 
     @ApiOperation("指定员工和工单,为其强制派单   [Admin Only]")
     @PostMapping("/fix/forceAssignOrder")
-    public void forceAssignOrder(String fixWorkerId, String fixOrderId) {
+    public int forceAssignOrder(String fixWorkerId, String fixOrderId) {
         // 生成当前时间节点
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss 已强制派单%");
         String currentStatus = tempDate.format(new java.util.Date());
-        fixService.forceAssignOrder(fixWorkerId, currentStatus, fixOrderId);
+        return fixService.forceAssignOrder(fixWorkerId, currentStatus, fixOrderId);
     }
 
 }

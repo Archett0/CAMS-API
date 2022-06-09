@@ -91,7 +91,7 @@ public class FixIntegrateTest {
         ResultActions resultActions =
                 mockMvc.perform(MockMvcRequestBuilders
                 .get("/fix/selectAllWorkersByDepartment")
-                .param("fixDepartmentId","FixDepart#1")
+                .param("fixDepartmentId","Dep#1")
                         .contentType(MediaType.APPLICATION_JSON)
                 );
         resultActions.andReturn().getResponse().setCharacterEncoding("UTF-8");
@@ -147,7 +147,7 @@ public class FixIntegrateTest {
         ResultActions resultActions =
                 mockMvc.perform(MockMvcRequestBuilders
                         .post("/fix/forceCloseOrder")
-                        .param("fixOrderId","Order#20211214201348")
+                        .param("fixOrderId","Order#2")
                         .contentType(MediaType.APPLICATION_JSON)
                 );
         resultActions.andReturn().getResponse().setCharacterEncoding("UTF-8");
@@ -158,7 +158,7 @@ public class FixIntegrateTest {
     public void forceAssignOrder() throws Exception {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        multiValueMap.add("fixOrderId", "Order#20211215145058");
+        multiValueMap.add("fixOrderId", "Order#2");
         multiValueMap.add("fixWorkerId", "User#2");
 
         ResultActions resultActions =
